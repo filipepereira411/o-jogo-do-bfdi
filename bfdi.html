@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>BFDI: Simulador de Votação Completo</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background-color: #282c34; color: white; padding: 20px; }
+        h1 { color: #61dafb; }
+        .grid-personagens { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; max-width: 1200px; margin: 30px auto; }
+        .card { background: #3a3f4b; border: 2px solid #4f5565; border-radius: 8px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: transform 0.2s; }
+        .card:hover { transform: translateY(-5px); border-color: #61dafb; }
+        .nome { font-weight: bold; font-size: 16px; margin-bottom: 8px; }
+        .votos { color: #a2a8b5; font-size: 14px; margin-bottom: 10px; }
+        button { background-color: #4caf50; color: white; border: none; border-radius: 4px; padding: 8px 12px; cursor: pointer; width: 100%; font-weight: bold; }
+        button:hover { background-color: #45a049; }
+        .placar { font-size: 18px; margin-top: 20px; background: #1e222b; padding: 15px; border-radius: 8px; display: inline-block; }
+    </style>
+</head>
+<body>
+
+    <h1>BFDI: Votação do Elenco Completo</h1>
+    <p>Escolhe o teu concorrente favorito para salvá-lo da eliminação!</p>
+    
+    <div class="placar" id="lider">Votos totais: 0 | Líder atual: Nenhum</div>
+
+    <!-- O JavaScript vai preencher esta área automaticamente com as 64 personagens -->
+    <div class="grid-personagens" id="grid"></div>
+
+    <script>
+        // Lista Oficial com os 64 concorrentes de BFDI / BFB
+        const personagensBfdi = [
+            "8-Ball", "Balloony", "Barf Bag", "Basketball", "Bell", "Black Hole", "Blocky", "Bomby", 
+            "Book", "Bottle", "Bracelety", "Bubble", "Cake", "Clock", "Cloudy", "Coiny", "David", 
+            "Donut", "Dora", "Eggy", "Eraser", "Fanny", "Firey", "Firey Jr.", "Flower", "Foldy", 
+            "Fries", "Gaty", "Gelatin", "Golf Ball", "Grassy", "Ice Cube", "Leafy", "Lightning", 
+            "Liy", "Lollipop", "Loser", "Marker", "Match", "Naily", "Needle", "Nickel", "Pen", 
+            "Pencil", "Pie", "Pillow", "Pin", "Price Tag", "Profily", "Puffball", "Remote", 
+            "Robot Flower", "Roboty", "Rocky", "Ruby", "Saw", "Snowball", "Spongy", "Stapy", 
+            "Taco", "Teardrop", "Tennis Ball", "Tree", "TV", "Winner", "Woody", "Yellow Face"
+        ];
+
+        // Objeto para armazenar a contagem de votos de cada um
+        let baseDeVotos = {};
+        let votosTotais = 0;
+
+        const gridHTML = document.getElementById('grid');
+
+        // Gerar os cards dinamicamente na página
+        personagensBfdi.forEach(nome => {
+            baseDeVotos[nome] = 0; // Inicializa os votos em zero
+
+            // Cria a estrutura HTML do card
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <div class="nome">${nome}</div>
+                <div class="votos">Votos: <span id="voto-${nome.replace(/[^a-zA-Z0-8]/g, '')}">0</span></div>
+                <button onclick="computarVoto('${nome}')">Votar</button>
+            `;
+            gridHTML.appendChild(card);
+        });
+
+        // Função que processa o clique de voto
+        function computarVoto(nome) {
+            baseDeVotos[nome]++;
+            votosTotais++;
+            
+            // Atualiza o número de votos no card correspondente
+            const idFormatado = 'voto-' + nome.replace(/[^a-zA-Z0-8]/g, '');
+            document.getElementById(idFormatado).innerText = baseDeVotos[nome];
+            
+            atualizarPainelGeral();
+        }
+
+        // Descobre quem está a ganhar e atualiza o topo da página
+        function atualizarPainelGeral() {
+            let liderAtual = "Nenhum";
+            let maxVotos = 0;
+
+            for (let nome in baseDeVotos) {
+                if (baseDeVotos[nome] > maxVotos) {
+                    maxVotos = baseDeVotos[nome];
+                    liderAtual = nome;
+                }
+            }
+
+            document.getElementById('lider').innerText = `Votos totais: ${votosTotais} | Líder atual: ${liderAtual} (${maxVotos} votos)`;
+        }
+    </script>
+</body>
+</html>
